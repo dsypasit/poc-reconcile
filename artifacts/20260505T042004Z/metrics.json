@@ -1,0 +1,36 @@
+{
+  "run_id": "20260505T042004Z",
+  "approach": "approach-a",
+  "tier": "small",
+  "kvrocks_addr": "127.0.0.1:6666",
+  "seed": 42,
+  "started_at": "2026-05-05T04:20:04.509555Z",
+  "completed_at": "2026-05-05T04:20:04.945395Z",
+  "duration_ms": 435,
+  "ingest_ms": 324,
+  "cutover_ms": 0,
+  "cleanup_ms": 0,
+  "errors": {
+    "cleanup": 0,
+    "cutover": 0,
+    "ingest": 670
+  },
+  "counts": {
+    "records_deleted": 0,
+    "records_written": 330
+  },
+  "metadata": {
+    "config_file": "config.json",
+    "dataset_hash": "115f68a434dbd1cc4295b19e80507bc4fa35016a35413a3945f14cb609495afc",
+    "manifest_file": "manifest.json",
+    "prefix": "bench:a:issue6:",
+    "strategy": "SCAN+UNLINK",
+    "validation_failure_reasons": "record_count_parity_failed,stratified_sampling_failed",
+    "validation_ms": "97",
+    "validation_passed": "false",
+    "validation_record_count_actual": "330",
+    "validation_record_count_expected": "1000",
+    "validation_sample_mismatches": "68",
+    "validation_sample_size": "100"
+  }
+}

@@ -41,6 +41,13 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 	if err != nil {
 		return metrics, err
 	}
+	manifest, err := bench.WriteReproducibilityArtifacts(cfg.OutDir, cfg, records)
+	if err != nil {
+		return metrics, err
+	}
+	metrics.Metadata["dataset_hash"] = manifest.DatasetHash
+	metrics.Metadata["manifest_file"] = "manifest.json"
+	metrics.Metadata["config_file"] = "config.json"
 
 	store := bench.NewKvrocks(cfg.KvrocksAddr)
 	defer store.Close()
