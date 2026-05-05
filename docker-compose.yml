@@ -15,13 +15,38 @@ services:
       retries: 20
       start_period: 5s
 
-  otel:
-    image: jaegertracing/all-in-one:1.62.0
-    container_name: kvrocks-bench-otel
-    profiles: ["otel"]
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.102.1
+    container_name: kvrocks-bench-otel-collector
+    profiles: ["otel-stack"]
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
     ports:
       - "4317:4317"
-      - "16686:16686"
+      - "4318:4318"
+    volumes:
+      - ./deployments/otel/collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: kvrocks-bench-prometheus
+    profiles: ["otel-stack"]
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - otel-collector
+    volumes:
+      - ./deployments/otel/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana:11.1.3
+    container_name: kvrocks-bench-grafana
+    profiles: ["otel-stack"]
+    ports:
+      - "3300:3000"
+    depends_on:
+      - prometheus
 
   runner:
     image: golang:1.24
