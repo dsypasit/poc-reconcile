@@ -30,10 +30,12 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 		Errors:      map[string]int{"ingest": 0, "cutover": 0, "cleanup": 0},
 		Counts:      map[string]int{"records_written": 0, "records_deleted": 0},
 		Metadata: map[string]string{
-			"strategy":             "SETEX+Version",
-			"prefix":               cfg.Prefix,
-			"data_ttl_seconds":     fmt.Sprintf("%d", defaultDataTTLSeconds),
-			"ttl_overlap_observed": "true",
+			"strategy":              "SETEX+Version",
+			"prefix":                cfg.Prefix,
+			"data_ttl_seconds":      fmt.Sprintf("%d", defaultDataTTLSeconds),
+			"ttl_overlap_observed":  "true",
+			"local_metrics_enabled": "true",
+			"otel_enabled":          strconv.FormatBool(cfg.OTELEnabled),
 		},
 	}
 
@@ -88,6 +90,13 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 	if err != nil || !validation.Passed {
 		metrics.CompletedAt = time.Now().UTC()
 		metrics.DurationMS = metrics.CompletedAt.Sub(started).Milliseconds()
+		if err := bench.ExportOTELIfEnabled(cfg.OutDir, cfg, metrics); err != nil {
+			metrics.Metadata["otel_export_status"] = "failed"
+		} else if cfg.OTELEnabled {
+			metrics.Metadata["otel_export_status"] = "exported"
+		} else {
+			metrics.Metadata["otel_export_status"] = "disabled"
+		}
 		if _, werr := bench.WriteArtifacts(cfg.OutDir, metrics); werr != nil {
 			return metrics, fmt.Errorf("write artifacts: %w", werr)
 		}
@@ -109,6 +118,13 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 
 	metrics.CompletedAt = time.Now().UTC()
 	metrics.DurationMS = metrics.CompletedAt.Sub(started).Milliseconds()
+	if err := bench.ExportOTELIfEnabled(cfg.OutDir, cfg, metrics); err != nil {
+		metrics.Metadata["otel_export_status"] = "failed"
+	} else if cfg.OTELEnabled {
+		metrics.Metadata["otel_export_status"] = "exported"
+	} else {
+		metrics.Metadata["otel_export_status"] = "disabled"
+	}
 
 	if _, err := bench.WriteArtifacts(cfg.OutDir, metrics); err != nil {
 		return metrics, fmt.Errorf("write artifacts: %w", err)

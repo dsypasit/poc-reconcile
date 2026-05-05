@@ -6,13 +6,15 @@ import (
 )
 
 type Config struct {
-	Approach    string
-	Tier        string
-	Seed        int64
-	KvrocksAddr string
-	Prefix      string
-	RunID       string
-	OutDir      string
+	Approach     string
+	Tier         string
+	Seed         int64
+	KvrocksAddr  string
+	Prefix       string
+	RunID        string
+	OutDir       string
+	OTELEnabled  bool
+	OTELEndpoint string
 }
 
 func (c Config) Validate() error {

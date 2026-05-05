@@ -13,24 +13,28 @@ import (
 
 func main() {
 	var (
-		tier        = flag.String("tier", "small", "dataset tier: small|medium")
-		seed        = flag.Int64("seed", 42, "dataset seed")
-		kvAddr      = flag.String("kvrocks-addr", "127.0.0.1:6666", "kvrocks address")
-		prefix      = flag.String("prefix", "bench:c:", "key prefix")
-		artifacts   = flag.String("artifacts-dir", "artifacts", "artifacts base directory")
-		timeoutSecs = flag.Int("timeout-seconds", 120, "run timeout seconds")
+		tier         = flag.String("tier", "small", "dataset tier: small|medium")
+		seed         = flag.Int64("seed", 42, "dataset seed")
+		kvAddr       = flag.String("kvrocks-addr", "127.0.0.1:6666", "kvrocks address")
+		prefix       = flag.String("prefix", "bench:c:", "key prefix")
+		artifacts    = flag.String("artifacts-dir", "artifacts", "artifacts base directory")
+		otelEnabled  = flag.Bool("otel-enabled", false, "enable optional OTEL export")
+		otelEndpoint = flag.String("otel-endpoint", "local-artifact", "OTEL exporter endpoint label")
+		timeoutSecs  = flag.Int("timeout-seconds", 120, "run timeout seconds")
 	)
 	flag.Parse()
 
 	runID := bench.NewRunID(time.Now())
 	cfg := bench.Config{
-		Approach:    "approach-c",
-		Tier:        *tier,
-		Seed:        *seed,
-		KvrocksAddr: *kvAddr,
-		Prefix:      *prefix,
-		RunID:       runID,
-		OutDir:      *artifacts,
+		Approach:     "approach-c",
+		Tier:         *tier,
+		Seed:         *seed,
+		KvrocksAddr:  *kvAddr,
+		Prefix:       *prefix,
+		RunID:        runID,
+		OutDir:       *artifacts,
+		OTELEnabled:  *otelEnabled,
+		OTELEndpoint: *otelEndpoint,
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSecs)*time.Second)

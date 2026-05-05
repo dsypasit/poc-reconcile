@@ -36,6 +36,8 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 			"cleanup_batch_size":     strconv.Itoa(defaultCleanupBatchSize),
 			"cleanup_pause_ms":       strconv.Itoa(defaultCleanupPauseMS),
 			"cleanup_backoff_events": "0",
+			"local_metrics_enabled":  "true",
+			"otel_enabled":           strconv.FormatBool(cfg.OTELEnabled),
 		},
 	}
 
@@ -99,6 +101,13 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 	if err != nil || !validation.Passed {
 		metrics.CompletedAt = time.Now().UTC()
 		metrics.DurationMS = metrics.CompletedAt.Sub(started).Milliseconds()
+		if err := bench.ExportOTELIfEnabled(cfg.OutDir, cfg, metrics); err != nil {
+			metrics.Metadata["otel_export_status"] = "failed"
+		} else if cfg.OTELEnabled {
+			metrics.Metadata["otel_export_status"] = "exported"
+		} else {
+			metrics.Metadata["otel_export_status"] = "disabled"
+		}
 		if _, werr := bench.WriteArtifacts(cfg.OutDir, metrics); werr != nil {
 			return metrics, fmt.Errorf("write artifacts: %w", werr)
 		}
@@ -155,6 +164,13 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 
 	metrics.CompletedAt = time.Now().UTC()
 	metrics.DurationMS = metrics.CompletedAt.Sub(started).Milliseconds()
+	if err := bench.ExportOTELIfEnabled(cfg.OutDir, cfg, metrics); err != nil {
+		metrics.Metadata["otel_export_status"] = "failed"
+	} else if cfg.OTELEnabled {
+		metrics.Metadata["otel_export_status"] = "exported"
+	} else {
+		metrics.Metadata["otel_export_status"] = "disabled"
+	}
 
 	if _, err := bench.WriteArtifacts(cfg.OutDir, metrics); err != nil {
 		return metrics, fmt.Errorf("write artifacts: %w", err)
