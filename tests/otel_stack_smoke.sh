@@ -20,6 +20,11 @@ wait_for_url() {
 }
 
 echo "Starting kvrocks + OTEL stack profile..."
+cleanup() {
+  docker compose --profile otel-stack down -v >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+
 docker compose --profile otel-stack up -d kvrocks otel-collector prometheus grafana >/dev/null
 
 echo "Waiting for Prometheus readiness endpoint..."
