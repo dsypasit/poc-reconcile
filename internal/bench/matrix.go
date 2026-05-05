@@ -56,7 +56,7 @@ func writeMatrixCSV(path string, runs []RunMetrics) error {
 	}
 	defer f.Close()
 	w := csv.NewWriter(f)
-	headers := []string{"run_id", "approach", "tier", "duration_ms", "ingest_ms", "cutover_ms", "cleanup_ms", "ingest_errors", "cutover_errors", "cleanup_errors", "records_written", "records_deleted", "ingest_throughput_rps", "overall_throughput_rps", "validation_passed"}
+	headers := []string{"run_id", "approach", "tier", "duration_ms", "ingest_ms", "cutover_ms", "cleanup_ms", "ingest_errors", "cutover_errors", "cleanup_errors", "records_written", "records_deleted", "ingest_throughput_rps", "overall_throughput_rps", "validation_passed", "producer_validity_passed", "producer_validity_reasons", "rank_eligible"}
 	if err := w.Write(headers); err != nil {
 		return fmt.Errorf("write matrix csv header: %w", err)
 	}
@@ -77,6 +77,9 @@ func writeMatrixCSV(path string, runs []RunMetrics) error {
 			m.Metadata["ingest_throughput_rps"],
 			m.Metadata["overall_throughput_rps"],
 			m.Metadata["validation_passed"],
+			m.Metadata["producer_validity_passed"],
+			m.Metadata["producer_validity_reasons"],
+			m.Metadata["rank_eligible"],
 		}
 		if err := w.Write(row); err != nil {
 			return fmt.Errorf("write matrix csv row: %w", err)
@@ -113,9 +116,14 @@ func writeMatrixReport(path string, summary MatrixSummary) error {
 		return runs[i].DurationMS < runs[j].DurationMS
 	})
 	b.WriteString("## Ranking by Duration\n")
-	for i, m := range runs {
+	rank := 0
+	for _, m := range runs {
+		if m.Metadata["rank_eligible"] != "true" {
+			continue
+		}
+		rank++
 		b.WriteString(fmt.Sprintf("%d. `%s %s` duration=%dms overall_rps=%s validation=%s seed=%d\n",
-			i+1,
+			rank,
 			m.Approach,
 			m.Tier,
 			m.DurationMS,

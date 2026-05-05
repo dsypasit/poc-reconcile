@@ -91,15 +91,20 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 		metrics.CompletedAt = time.Now().UTC()
 		metrics.DurationMS = metrics.CompletedAt.Sub(started).Milliseconds()
 		bench.PopulateDerivedMetrics(&metrics)
-		if err := bench.ExportOTELIfEnabled(cfg.OutDir, cfg, metrics); err != nil {
+		otelErr := bench.ExportOTELIfEnabled(cfg.OutDir, cfg, metrics)
+		if otelErr != nil {
 			metrics.Metadata["otel_export_status"] = "failed"
 		} else if cfg.OTELEnabled {
 			metrics.Metadata["otel_export_status"] = "exported"
 		} else {
 			metrics.Metadata["otel_export_status"] = "disabled"
 		}
+		validityErr := bench.ApplyProducerValidityGate(cfg, &metrics, otelErr)
 		if _, werr := bench.WriteArtifacts(cfg.OutDir, metrics); werr != nil {
 			return metrics, fmt.Errorf("write artifacts: %w", werr)
+		}
+		if validityErr != nil {
+			return metrics, validityErr
 		}
 		if err != nil {
 			return metrics, fmt.Errorf("validation gate error: %w", err)
@@ -120,16 +125,21 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 	metrics.CompletedAt = time.Now().UTC()
 	metrics.DurationMS = metrics.CompletedAt.Sub(started).Milliseconds()
 	bench.PopulateDerivedMetrics(&metrics)
-	if err := bench.ExportOTELIfEnabled(cfg.OutDir, cfg, metrics); err != nil {
+	otelErr := bench.ExportOTELIfEnabled(cfg.OutDir, cfg, metrics)
+	if otelErr != nil {
 		metrics.Metadata["otel_export_status"] = "failed"
 	} else if cfg.OTELEnabled {
 		metrics.Metadata["otel_export_status"] = "exported"
 	} else {
 		metrics.Metadata["otel_export_status"] = "disabled"
 	}
+	validityErr := bench.ApplyProducerValidityGate(cfg, &metrics, otelErr)
 
 	if _, err := bench.WriteArtifacts(cfg.OutDir, metrics); err != nil {
 		return metrics, fmt.Errorf("write artifacts: %w", err)
+	}
+	if validityErr != nil {
+		return metrics, validityErr
 	}
 	return metrics, nil
 }

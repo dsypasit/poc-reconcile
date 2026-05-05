@@ -62,3 +62,64 @@ func TestExportOTELIfEnabled(t *testing.T) {
 		}
 	}
 }
+
+func TestApplyProducerValidityGate(t *testing.T) {
+	cfg := Config{
+		Approach:     "approach-a",
+		Tier:         "small",
+		Seed:         42,
+		MatrixID:     "matrix-test",
+		RunID:        "run-pass",
+		OTELEnabled:  true,
+		OTELEndpoint: "otlp-local",
+	}
+	m := RunMetrics{
+		RunID:      cfg.RunID,
+		Approach:   cfg.Approach,
+		Tier:       cfg.Tier,
+		Seed:       cfg.Seed,
+		DurationMS: 1,
+		IngestMS:   1,
+		CutoverMS:  1,
+		CleanupMS:  1,
+		Errors:     map[string]int{"ingest": 0, "cutover": 0, "cleanup": 0},
+		Counts:     map[string]int{"records_written": 1, "records_deleted": 0},
+		Metadata:   map[string]string{"otel_export_status": "exported"},
+	}
+	if err := ApplyProducerValidityGate(cfg, &m, nil); err != nil {
+		t.Fatalf("expected valid producer gate, got %v", err)
+	}
+	if m.Metadata["producer_validity_passed"] != "true" || m.Metadata["rank_eligible"] != "true" {
+		t.Fatalf("expected valid/rankable metadata, got %#v", m.Metadata)
+	}
+}
+
+func TestApplyProducerValidityGateRejectsDisabledOTEL(t *testing.T) {
+	cfg := Config{
+		Approach:     "approach-a",
+		Tier:         "small",
+		Seed:         42,
+		RunID:        "run-fail",
+		OTELEnabled:  false,
+		OTELEndpoint: "otlp-local",
+	}
+	m := RunMetrics{
+		RunID:      cfg.RunID,
+		Approach:   cfg.Approach,
+		Tier:       cfg.Tier,
+		Seed:       cfg.Seed,
+		DurationMS: 1,
+		IngestMS:   1,
+		CutoverMS:  1,
+		CleanupMS:  1,
+		Errors:     map[string]int{"ingest": 0, "cutover": 0, "cleanup": 0},
+		Counts:     map[string]int{"records_written": 1, "records_deleted": 0},
+		Metadata:   map[string]string{"otel_export_status": "disabled"},
+	}
+	if err := ApplyProducerValidityGate(cfg, &m, nil); err == nil {
+		t.Fatalf("expected producer validity gate failure")
+	}
+	if m.Metadata["producer_validity_passed"] != "false" || m.Metadata["rank_eligible"] != "false" {
+		t.Fatalf("expected invalid/non-rankable metadata, got %#v", m.Metadata)
+	}
+}

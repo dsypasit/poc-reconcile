@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -53,17 +54,7 @@ func ExportOTELIfEnabled(baseDir string, cfg Config, m RunMetrics) error {
 		Endpoint:    cfg.OTELEndpoint,
 		Labels:      requiredOTELLabels(cfg, m),
 		MetricNames: MetricsNameMap(),
-		Values: map[string]int64{
-			"duration_ms":     nonNegativeInt64(m.DurationMS),
-			"ingest_ms":       nonNegativeInt64(m.IngestMS),
-			"cutover_ms":      nonNegativeInt64(m.CutoverMS),
-			"cleanup_ms":      nonNegativeInt64(m.CleanupMS),
-			"ingest_errors":   nonNegativeInt64(int64(m.Errors["ingest"])),
-			"cutover_errors":  nonNegativeInt64(int64(m.Errors["cutover"])),
-			"cleanup_errors":  nonNegativeInt64(int64(m.Errors["cleanup"])),
-			"records_written": nonNegativeInt64(int64(m.Counts["records_written"])),
-			"records_deleted": nonNegativeInt64(int64(m.Counts["records_deleted"])),
-		},
+		Values:      nonNegativeMetricValues(rawMetricValues(m)),
 	}
 	payload, err := json.MarshalIndent(envelope, "", "  ")
 	if err != nil {
@@ -74,6 +65,38 @@ func ExportOTELIfEnabled(baseDir string, cfg Config, m RunMetrics) error {
 		return fmt.Errorf("write otel export: %w", err)
 	}
 	return nil
+}
+
+func ApplyProducerValidityGate(cfg Config, m *RunMetrics, exportErr error) error {
+	if m.Metadata == nil {
+		m.Metadata = map[string]string{}
+	}
+	reasons := make([]string, 0, 8)
+	if !cfg.OTELEnabled {
+		reasons = append(reasons, "otel_required_disabled")
+	}
+	if exportErr != nil || m.Metadata["otel_export_status"] != "exported" {
+		reasons = append(reasons, "otel_export_not_success")
+	}
+	for k, v := range requiredOTELLabels(cfg, *m) {
+		if strings.TrimSpace(v) == "" {
+			reasons = append(reasons, "otel_missing_label_"+k)
+		}
+	}
+	for metric, value := range rawMetricValues(*m) {
+		if value < 0 {
+			reasons = append(reasons, "otel_negative_metric_"+metric)
+		}
+	}
+	passed := len(reasons) == 0
+	m.Metadata["producer_validity_passed"] = strconv.FormatBool(passed)
+	m.Metadata["rank_eligible"] = strconv.FormatBool(passed)
+	if passed {
+		m.Metadata["producer_validity_reasons"] = ""
+		return nil
+	}
+	m.Metadata["producer_validity_reasons"] = strings.Join(reasons, ",")
+	return fmt.Errorf("producer validity gate failed: %s", m.Metadata["producer_validity_reasons"])
 }
 
 func requiredOTELLabels(cfg Config, m RunMetrics) map[string]string {
@@ -88,6 +111,28 @@ func requiredOTELLabels(cfg Config, m RunMetrics) map[string]string {
 		labels["matrix_id"] = cfg.MatrixID
 	}
 	return labels
+}
+
+func rawMetricValues(m RunMetrics) map[string]int64 {
+	return map[string]int64{
+		"duration_ms":     m.DurationMS,
+		"ingest_ms":       m.IngestMS,
+		"cutover_ms":      m.CutoverMS,
+		"cleanup_ms":      m.CleanupMS,
+		"ingest_errors":   int64(m.Errors["ingest"]),
+		"cutover_errors":  int64(m.Errors["cutover"]),
+		"cleanup_errors":  int64(m.Errors["cleanup"]),
+		"records_written": int64(m.Counts["records_written"]),
+		"records_deleted": int64(m.Counts["records_deleted"]),
+	}
+}
+
+func nonNegativeMetricValues(raw map[string]int64) map[string]int64 {
+	out := make(map[string]int64, len(raw))
+	for k, v := range raw {
+		out[k] = nonNegativeInt64(v)
+	}
+	return out
 }
 
 func nonNegativeInt64(v int64) int64 {
