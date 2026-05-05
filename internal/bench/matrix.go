@@ -25,6 +25,10 @@ func WriteMatrixArtifacts(baseDir, matrixID string, runs []RunMetrics, failures 
 		return "", fmt.Errorf("create matrix dir: %w", err)
 	}
 
+	for i := range runs {
+		RevalidateRunForConsumer(&runs[i])
+	}
+
 	summary := MatrixSummary{
 		MatrixID:    matrixID,
 		GeneratedAt: time.Now().UTC(),

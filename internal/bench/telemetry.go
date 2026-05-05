@@ -79,6 +79,7 @@ func ApplyProducerValidityGate(cfg Config, m *RunMetrics, exportErr error) error
 		reasons = append(reasons, "otel_export_not_success")
 	}
 	for k, v := range requiredOTELLabels(cfg, *m) {
+		m.Metadata["otel_label_"+k] = v
 		if strings.TrimSpace(v) == "" {
 			reasons = append(reasons, "otel_missing_label_"+k)
 		}
