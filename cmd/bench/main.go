@@ -50,6 +50,7 @@ func main() {
 			Approach:    s.approach,
 			Tier:        s.tier,
 			Seed:        *seed,
+			MatrixID:    matrixID,
 			KvrocksAddr: *kvAddr,
 			Prefix:      fmt.Sprintf("%s%s:%s:", s.prefix, matrixID, s.tier),
 			RunID:       runID,

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 )
 
@@ -12,8 +13,10 @@ type OTelExportEnvelope struct {
 	RunID       string            `json:"run_id"`
 	Approach    string            `json:"approach"`
 	Tier        string            `json:"tier"`
+	Seed        int64             `json:"seed"`
 	ExportedAt  time.Time         `json:"exported_at"`
 	Endpoint    string            `json:"endpoint"`
+	Labels      map[string]string `json:"labels"`
 	MetricNames map[string]string `json:"metric_names"`
 	Values      map[string]int64  `json:"values"`
 }
@@ -45,19 +48,21 @@ func ExportOTELIfEnabled(baseDir string, cfg Config, m RunMetrics) error {
 		RunID:       m.RunID,
 		Approach:    m.Approach,
 		Tier:        m.Tier,
+		Seed:        m.Seed,
 		ExportedAt:  time.Now().UTC(),
 		Endpoint:    cfg.OTELEndpoint,
+		Labels:      requiredOTELLabels(cfg, m),
 		MetricNames: MetricsNameMap(),
 		Values: map[string]int64{
-			"duration_ms":     m.DurationMS,
-			"ingest_ms":       m.IngestMS,
-			"cutover_ms":      m.CutoverMS,
-			"cleanup_ms":      m.CleanupMS,
-			"ingest_errors":   int64(m.Errors["ingest"]),
-			"cutover_errors":  int64(m.Errors["cutover"]),
-			"cleanup_errors":  int64(m.Errors["cleanup"]),
-			"records_written": int64(m.Counts["records_written"]),
-			"records_deleted": int64(m.Counts["records_deleted"]),
+			"duration_ms":     nonNegativeInt64(m.DurationMS),
+			"ingest_ms":       nonNegativeInt64(m.IngestMS),
+			"cutover_ms":      nonNegativeInt64(m.CutoverMS),
+			"cleanup_ms":      nonNegativeInt64(m.CleanupMS),
+			"ingest_errors":   nonNegativeInt64(int64(m.Errors["ingest"])),
+			"cutover_errors":  nonNegativeInt64(int64(m.Errors["cutover"])),
+			"cleanup_errors":  nonNegativeInt64(int64(m.Errors["cleanup"])),
+			"records_written": nonNegativeInt64(int64(m.Counts["records_written"])),
+			"records_deleted": nonNegativeInt64(int64(m.Counts["records_deleted"])),
 		},
 	}
 	payload, err := json.MarshalIndent(envelope, "", "  ")
@@ -69,4 +74,25 @@ func ExportOTELIfEnabled(baseDir string, cfg Config, m RunMetrics) error {
 		return fmt.Errorf("write otel export: %w", err)
 	}
 	return nil
+}
+
+func requiredOTELLabels(cfg Config, m RunMetrics) map[string]string {
+	labels := map[string]string{
+		"run_id":   m.RunID,
+		"approach": m.Approach,
+		"tier":     m.Tier,
+		"seed":     strconv.FormatInt(m.Seed, 10),
+		"endpoint": cfg.OTELEndpoint,
+	}
+	if cfg.MatrixID != "" {
+		labels["matrix_id"] = cfg.MatrixID
+	}
+	return labels
+}
+
+func nonNegativeInt64(v int64) int64 {
+	if v < 0 {
+		return 0
+	}
+	return v
 }

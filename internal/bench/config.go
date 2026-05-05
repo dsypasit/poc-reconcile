@@ -9,6 +9,7 @@ type Config struct {
 	Approach     string
 	Tier         string
 	Seed         int64
+	MatrixID     string
 	KvrocksAddr  string
 	Prefix       string
 	RunID        string
