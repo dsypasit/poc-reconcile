@@ -1,0 +1,39 @@
+services:
+  kvrocks:
+    image: apache/kvrocks:2.11.0
+    container_name: kvrocks-bench
+    command: ["--bind", "0.0.0.0"]
+    ports:
+      - "6666:6666"
+      - "6667:6667"
+    volumes:
+      - kvrocks-data:/var/lib/kvrocks
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "-p", "6666", "PING"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+  otel:
+    image: jaegertracing/all-in-one:1.62.0
+    container_name: kvrocks-bench-otel
+    profiles: ["otel"]
+    ports:
+      - "4317:4317"
+      - "16686:16686"
+
+  runner:
+    image: golang:1.24
+    container_name: kvrocks-bench-runner
+    profiles: ["runner"]
+    working_dir: /workspace
+    command: ["sleep", "infinity"]
+    depends_on:
+      kvrocks:
+        condition: service_healthy
+    volumes:
+      - ./:/workspace
+
+volumes:
+  kvrocks-data:

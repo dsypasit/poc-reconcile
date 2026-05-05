@@ -1,0 +1,42 @@
+{
+  "run_id": "20260505T043904Z",
+  "approach": "approach-c",
+  "tier": "small",
+  "kvrocks_addr": "127.0.0.1:6666",
+  "seed": 42,
+  "started_at": "2026-05-05T04:39:04.579963Z",
+  "completed_at": "2026-05-05T04:39:08.805326Z",
+  "duration_ms": 4225,
+  "ingest_ms": 2833,
+  "cutover_ms": 12,
+  "cleanup_ms": 475,
+  "errors": {
+    "cleanup": 0,
+    "cutover": 0,
+    "ingest": 0
+  },
+  "counts": {
+    "records_deleted": 0,
+    "records_written": 1000
+  },
+  "metadata": {
+    "active_slot_before": "blue",
+    "config_file": "config.json",
+    "dataset_hash": "115f68a434dbd1cc4295b19e80507bc4fa35016a35413a3945f14cb609495afc",
+    "inactive_slot_loaded": "green",
+    "local_metrics_enabled": "true",
+    "manifest_file": "manifest.json",
+    "old_slot_cleaned": "blue",
+    "old_slot_cleanup_deleted": "0",
+    "otel_enabled": "false",
+    "otel_export_status": "disabled",
+    "prefix": "bench:c:issue8v:",
+    "strategy": "BlueGreenPrefixSwap",
+    "validation_ms": "697",
+    "validation_passed": "true",
+    "validation_record_count_actual": "1000",
+    "validation_record_count_expected": "1000",
+    "validation_sample_mismatches": "0",
+    "validation_sample_size": "100"
+  }
+}

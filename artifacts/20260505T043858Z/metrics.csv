@@ -1,0 +1,2 @@
+run_id,approach,tier,kvrocks_addr,seed,ingest_ms,cutover_ms,cleanup_ms,duration_ms,ingest_errors,cutover_errors,cleanup_errors,records_written,records_deleted
+20260505T043858Z,approach-a,small,127.0.0.1:6666,42,939,0,77,1170,0,0,0,1000,0

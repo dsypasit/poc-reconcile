@@ -1,0 +1,40 @@
+{
+  "run_id": "20260505T043901Z",
+  "approach": "approach-b",
+  "tier": "small",
+  "kvrocks_addr": "127.0.0.1:6666",
+  "seed": 42,
+  "started_at": "2026-05-05T04:39:01.903481Z",
+  "completed_at": "2026-05-05T04:39:02.64585Z",
+  "duration_ms": 742,
+  "ingest_ms": 589,
+  "cutover_ms": 0,
+  "cleanup_ms": 0,
+  "errors": {
+    "cleanup": 0,
+    "cutover": 0,
+    "ingest": 0
+  },
+  "counts": {
+    "records_deleted": 0,
+    "records_written": 1000
+  },
+  "metadata": {
+    "config_file": "config.json",
+    "data_ttl_seconds": "3600",
+    "dataset_hash": "115f68a434dbd1cc4295b19e80507bc4fa35016a35413a3945f14cb609495afc",
+    "local_metrics_enabled": "true",
+    "manifest_file": "manifest.json",
+    "otel_enabled": "false",
+    "otel_export_status": "disabled",
+    "prefix": "bench:b:issue8v:",
+    "strategy": "SETEX+Version",
+    "ttl_overlap_observed": "true",
+    "validation_ms": "144",
+    "validation_passed": "true",
+    "validation_record_count_actual": "1000",
+    "validation_record_count_expected": "1000",
+    "validation_sample_mismatches": "0",
+    "validation_sample_size": "100"
+  }
+}

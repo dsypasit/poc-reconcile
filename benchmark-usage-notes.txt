@@ -1,0 +1,22 @@
+Benchmark usage notes
+
+1) Start baseline Kvrocks only:
+   docker compose up -d kvrocks
+
+2) Start Kvrocks + optional OTEL collector UI:
+   docker compose --profile otel up -d kvrocks otel
+
+3) Start optional runner container for in-compose execution:
+   docker compose --profile runner up -d kvrocks runner
+
+4) Run small-tier approaches from host:
+   rtk go run ./cmd/approach-a -tier small -kvrocks-addr 127.0.0.1:6666
+   rtk go run ./cmd/approach-b -tier small -kvrocks-addr 127.0.0.1:6666
+   rtk go run ./cmd/approach-c -tier small -kvrocks-addr 127.0.0.1:6666
+   rtk go run ./cmd/approach-d -tier small -kvrocks-addr 127.0.0.1:6666
+
+5) OTEL toggle per run (local metrics always emitted):
+   add -otel-enabled=true -otel-endpoint=<label>
+
+6) Stop environment:
+   docker compose down

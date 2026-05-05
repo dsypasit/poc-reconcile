@@ -1,0 +1,8 @@
+{
+  "approach": "approach-c",
+  "tier": "small",
+  "seed": 42,
+  "kvrocks_addr": "127.0.0.1:6666",
+  "prefix": "bench:c:issue8v:",
+  "run_id": "20260505T043904Z"
+}
