@@ -3,6 +3,7 @@ package bench
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -24,6 +25,10 @@ func (k *Kvrocks) Ping(ctx context.Context) error {
 
 func (k *Kvrocks) Set(ctx context.Context, key, value string) error {
 	return k.client.Set(ctx, key, value, 0).Err()
+}
+
+func (k *Kvrocks) SetEX(ctx context.Context, key, value string, ttl time.Duration) error {
+	return k.client.Set(ctx, key, value, ttl).Err()
 }
 
 func (k *Kvrocks) Unlink(ctx context.Context, keys ...string) error {
