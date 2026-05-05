@@ -1,0 +1,33 @@
+{
+  "run_id": "20260505T041452Z",
+  "approach": "approach-d",
+  "tier": "small",
+  "kvrocks_addr": "127.0.0.1:6666",
+  "seed": 42,
+  "started_at": "2026-05-05T04:14:52.325995Z",
+  "completed_at": "2026-05-05T04:14:52.661711Z",
+  "duration_ms": 335,
+  "ingest_ms": 318,
+  "cutover_ms": 0,
+  "cleanup_ms": 0,
+  "errors": {
+    "cleanup": 0,
+    "cutover": 0,
+    "ingest": 668
+  },
+  "counts": {
+    "records_deleted": 0,
+    "records_written": 332
+  },
+  "metadata": {
+    "active_version_after": "20260505T041452Z",
+    "active_version_before": "",
+    "cleanup_backoff_events": "0",
+    "cleanup_batch_size": "200",
+    "cleanup_batches": "0",
+    "cleanup_deleted": "0",
+    "cleanup_pause_ms": "20",
+    "prefix": "bench:d:",
+    "strategy": "VersionPrefix+ThrottledUNLINK"
+  }
+}
