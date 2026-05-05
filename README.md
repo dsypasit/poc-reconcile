@@ -67,20 +67,25 @@ rtk go run ./cmd/approach-d \
 You can replace `approach-d` with `approach-a`, `approach-b`, or
 `approach-c`, and set `-tier medium` as needed.
 
-## Optional OTEL export
+## OTEL-required runs (default)
 
-Local JSON/CSV metrics are always emitted. OTEL export is optional.
+OTEL export is enabled by default for all commands and is required for valid,
+rank-eligible runs.
 
 ```bash
 rtk go run ./cmd/approach-c \
   -tier small \
   -kvrocks-addr 127.0.0.1:6666 \
-  -otel-enabled=true \
   -otel-endpoint=otlp-local
 ```
 
-When enabled, each run also writes `otel-metrics.json` in that run's artifact
-folder.
+Validity and ranking behavior:
+- Producer hard gate requires `-otel-enabled=true` and successful export.
+- Consumer re-validation quarantines invalid runs with rejection categories.
+- Ranking uses canonical OTEL values (`duration_ms`, derived overall throughput)
+  and surfaces OTEL-vs-local mismatches as quality failures.
+
+Local JSON/CSV artifacts remain persisted as secondary audit evidence.
 
 ## OTEL stack smoke check
 
@@ -98,7 +103,7 @@ Each run writes under `artifacts/<run_id>/`:
 - `metrics.csv`
 - `config.json`
 - `manifest.json`
-- `otel-metrics.json` (only when OTEL is enabled)
+- `otel-metrics.json` (canonical telemetry snapshot for ranking)
 
 ## Stop the environment
 

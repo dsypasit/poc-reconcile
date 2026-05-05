@@ -20,6 +20,8 @@ func main() {
 		artifacts   = flag.String("artifacts-dir", "artifacts", "artifacts base directory")
 		seed        = flag.Int64("seed", 42, "dataset seed")
 		timeoutSecs = flag.Int("timeout-seconds", 300, "per-run timeout seconds")
+		otelEnabled = flag.Bool("otel-enabled", true, "enable OTEL export (required for valid/rankable runs)")
+		otelEP      = flag.String("otel-endpoint", "otlp-local", "OTEL exporter endpoint label")
 	)
 	flag.Parse()
 
@@ -47,14 +49,16 @@ func main() {
 	for i, s := range scenarios {
 		runID := fmt.Sprintf("%s-%02d", bench.NewRunID(time.Now()), i+1)
 		cfg := bench.Config{
-			Approach:    s.approach,
-			Tier:        s.tier,
-			Seed:        *seed,
-			MatrixID:    matrixID,
-			KvrocksAddr: *kvAddr,
-			Prefix:      fmt.Sprintf("%s%s:%s:", s.prefix, matrixID, s.tier),
-			RunID:       runID,
-			OutDir:      *artifacts,
+			Approach:     s.approach,
+			Tier:         s.tier,
+			Seed:         *seed,
+			MatrixID:     matrixID,
+			KvrocksAddr:  *kvAddr,
+			Prefix:       fmt.Sprintf("%s%s:%s:", s.prefix, matrixID, s.tier),
+			RunID:        runID,
+			OutDir:       *artifacts,
+			OTELEnabled:  *otelEnabled,
+			OTELEndpoint: *otelEP,
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSecs)*time.Second)
 		metrics, err := s.run(ctx, cfg)

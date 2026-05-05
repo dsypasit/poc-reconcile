@@ -25,11 +25,12 @@ Benchmark usage notes
 5) Run one-command required matrix (A/B/C/D across small+medium):
    rtk go run ./cmd/bench -kvrocks-addr 127.0.0.1:6666 -artifacts-dir artifacts
 
-6) OTEL toggle per run (local metrics always emitted):
-   add -otel-enabled=true -otel-endpoint=<label>
+6) OTEL is required by default for valid/rankable runs:
+   defaults: -otel-enabled=true -otel-endpoint=otlp-local
+   set -otel-enabled=false only for debugging; those runs are rejected.
 
 7) OTEL stack smoke check:
    ./tests/otel_stack_smoke.sh
 
-7) Stop environment:
+8) Stop environment:
    docker compose down
