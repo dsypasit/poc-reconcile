@@ -1,0 +1,46 @@
+{
+  "run_id": "20260505T061703Z",
+  "approach": "approach-c",
+  "tier": "medium",
+  "kvrocks_addr": "127.0.0.1:6666",
+  "seed": 42,
+  "started_at": "2026-05-05T06:17:03.165693Z",
+  "completed_at": "2026-05-05T06:17:06.076416Z",
+  "duration_ms": 2910,
+  "ingest_ms": 2687,
+  "cutover_ms": 0,
+  "cleanup_ms": 70,
+  "errors": {
+    "cleanup": 0,
+    "cutover": 0,
+    "ingest": 0
+  },
+  "counts": {
+    "records_deleted": 0,
+    "records_written": 10000
+  },
+  "metadata": {
+    "active_slot_before": "blue",
+    "config_file": "config.json",
+    "dataset_hash": "31a4c05e1cda52fe147081526cf5a8084ce1f18c879376aee2f3918535313613",
+    "inactive_slot_loaded": "green",
+    "ingest_throughput_rps": "3721.62",
+    "local_metrics_enabled": "true",
+    "manifest_file": "manifest.json",
+    "old_slot_cleaned": "blue",
+    "old_slot_cleanup_deleted": "0",
+    "otel_enabled": "false",
+    "otel_export_status": "disabled",
+    "overall_throughput_rps": "3436.43",
+    "prefix": "bench:c:issue9v2:",
+    "records_deleted": "0",
+    "records_written": "10000",
+    "strategy": "BlueGreenPrefixSwap",
+    "validation_ms": "144",
+    "validation_passed": "true",
+    "validation_record_count_actual": "10000",
+    "validation_record_count_expected": "10000",
+    "validation_sample_mismatches": "0",
+    "validation_sample_size": "200"
+  }
+}

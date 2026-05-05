@@ -103,6 +103,7 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 	if err != nil || !validation.Passed {
 		metrics.CompletedAt = time.Now().UTC()
 		metrics.DurationMS = metrics.CompletedAt.Sub(started).Milliseconds()
+		bench.PopulateDerivedMetrics(&metrics)
 		if err := bench.ExportOTELIfEnabled(cfg.OutDir, cfg, metrics); err != nil {
 			metrics.Metadata["otel_export_status"] = "failed"
 		} else if cfg.OTELEnabled {
@@ -148,6 +149,7 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 
 	metrics.CompletedAt = time.Now().UTC()
 	metrics.DurationMS = metrics.CompletedAt.Sub(started).Milliseconds()
+	bench.PopulateDerivedMetrics(&metrics)
 	if err := bench.ExportOTELIfEnabled(cfg.OutDir, cfg, metrics); err != nil {
 		metrics.Metadata["otel_export_status"] = "failed"
 	} else if cfg.OTELEnabled {
