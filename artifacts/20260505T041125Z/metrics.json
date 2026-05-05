@@ -1,0 +1,30 @@
+{
+  "run_id": "20260505T041125Z",
+  "approach": "approach-c",
+  "tier": "small",
+  "kvrocks_addr": "127.0.0.1:6666",
+  "seed": 42,
+  "started_at": "2026-05-05T04:11:25.442948Z",
+  "completed_at": "2026-05-05T04:11:25.714098Z",
+  "duration_ms": 271,
+  "ingest_ms": 225,
+  "cutover_ms": 0,
+  "cleanup_ms": 28,
+  "errors": {
+    "cleanup": 0,
+    "cutover": 2,
+    "ingest": 670
+  },
+  "counts": {
+    "records_deleted": 0,
+    "records_written": 330
+  },
+  "metadata": {
+    "active_slot_before": "blue",
+    "inactive_slot_loaded": "green",
+    "old_slot_cleaned": "blue",
+    "old_slot_cleanup_deleted": "0",
+    "prefix": "bench:c:",
+    "strategy": "BlueGreenPrefixSwap"
+  }
+}

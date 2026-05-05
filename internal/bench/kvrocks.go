@@ -31,6 +31,17 @@ func (k *Kvrocks) SetEX(ctx context.Context, key, value string, ttl time.Duratio
 	return k.client.Set(ctx, key, value, ttl).Err()
 }
 
+func (k *Kvrocks) Get(ctx context.Context, key string) (string, error) {
+	v, err := k.client.Get(ctx, key).Result()
+	if err == redis.Nil {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+	return v, nil
+}
+
 func (k *Kvrocks) Unlink(ctx context.Context, keys ...string) error {
 	if len(keys) == 0 {
 		return nil
