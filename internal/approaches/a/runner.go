@@ -3,6 +3,7 @@ package a
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -50,6 +51,34 @@ func Run(ctx context.Context, cfg bench.Config) (bench.RunMetrics, error) {
 		newKeys[fullKey] = struct{}{}
 	}
 	metrics.IngestMS = time.Since(ingestStart).Milliseconds()
+
+	validationStart := time.Now()
+	validation, err := bench.ValidateCorrectness(ctx, store, records, func(rec bench.Record) string {
+		return cfg.Prefix + rec.Key
+	}, cfg.Prefix)
+	if err != nil {
+		metrics.Errors["cutover"]++
+	}
+	metrics.Metadata["validation_record_count_expected"] = strconv.Itoa(validation.ExpectedCount)
+	metrics.Metadata["validation_record_count_actual"] = strconv.Itoa(validation.ActualCount)
+	metrics.Metadata["validation_sample_size"] = strconv.Itoa(validation.SampleSize)
+	metrics.Metadata["validation_sample_mismatches"] = strconv.Itoa(validation.SampleMismatches)
+	metrics.Metadata["validation_passed"] = strconv.FormatBool(validation.Passed)
+	metrics.Metadata["validation_ms"] = strconv.FormatInt(time.Since(validationStart).Milliseconds(), 10)
+	if len(validation.FailureReasons) > 0 {
+		metrics.Metadata["validation_failure_reasons"] = strings.Join(validation.FailureReasons, ",")
+	}
+	if err != nil || !validation.Passed {
+		metrics.CompletedAt = time.Now().UTC()
+		metrics.DurationMS = metrics.CompletedAt.Sub(started).Milliseconds()
+		if _, werr := bench.WriteArtifacts(cfg.OutDir, metrics); werr != nil {
+			return metrics, fmt.Errorf("write artifacts: %w", werr)
+		}
+		if err != nil {
+			return metrics, fmt.Errorf("validation gate error: %w", err)
+		}
+		return metrics, fmt.Errorf("validation gate failed: %s", metrics.Metadata["validation_failure_reasons"])
+	}
 
 	cutoverStart := time.Now()
 	if err := store.Set(ctx, cfg.Prefix+"_cutover_marker", cfg.RunID); err != nil {

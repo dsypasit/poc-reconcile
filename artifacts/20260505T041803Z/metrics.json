@@ -1,0 +1,37 @@
+{
+  "run_id": "20260505T041803Z",
+  "approach": "approach-d",
+  "tier": "small",
+  "kvrocks_addr": "127.0.0.1:6666",
+  "seed": 42,
+  "started_at": "2026-05-05T04:18:03.926995Z",
+  "completed_at": "2026-05-05T04:18:04.489301Z",
+  "duration_ms": 562,
+  "ingest_ms": 410,
+  "cutover_ms": 0,
+  "cleanup_ms": 0,
+  "errors": {
+    "cleanup": 0,
+    "cutover": 0,
+    "ingest": 667
+  },
+  "counts": {
+    "records_deleted": 0,
+    "records_written": 333
+  },
+  "metadata": {
+    "active_version_before": "",
+    "cleanup_backoff_events": "0",
+    "cleanup_batch_size": "200",
+    "cleanup_pause_ms": "20",
+    "prefix": "bench:d:issue5:",
+    "strategy": "VersionPrefix+ThrottledUNLINK",
+    "validation_failure_reasons": "record_count_parity_failed,stratified_sampling_failed",
+    "validation_ms": "134",
+    "validation_passed": "false",
+    "validation_record_count_actual": "333",
+    "validation_record_count_expected": "1000",
+    "validation_sample_mismatches": "63",
+    "validation_sample_size": "100"
+  }
+}
