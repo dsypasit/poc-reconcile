@@ -1,0 +1,97 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "table",
+      "title": "Ranking (Duration asc, Throughput desc)",
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
+      "targets": [
+        {
+          "expr": "sort by (approach, tier, run_id) (benchmark_duration_ms{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"})",
+          "legendFormat": "duration_ms",
+          "refId": "A",
+          "instant": true
+        },
+        {
+          "expr": "sort_desc by (approach, tier, run_id) (benchmark_overall_throughput_rps{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"})",
+          "legendFormat": "overall_throughput_rps",
+          "refId": "B",
+          "instant": true
+        }
+      ],
+      "options": {"showHeader": true}
+    },
+    {
+      "type": "timeseries",
+      "title": "Phase Timing (ms)",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 10},
+      "targets": [
+        {"expr": "benchmark_ingest_ms{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"}", "refId": "A"},
+        {"expr": "benchmark_cutover_ms{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"}", "refId": "B"},
+        {"expr": "benchmark_cleanup_ms{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"}", "refId": "C"}
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Phase Errors (total)",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 10},
+      "targets": [
+        {"expr": "benchmark_ingest_errors_total{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"}", "refId": "A"},
+        {"expr": "benchmark_cutover_errors_total{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"}", "refId": "B"},
+        {"expr": "benchmark_cleanup_errors_total{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"}", "refId": "C"}
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Records Written / Deleted",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 18},
+      "targets": [
+        {"expr": "benchmark_records_written_total{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"}", "refId": "A"},
+        {"expr": "benchmark_records_deleted_total{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"}", "refId": "B"}
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Rejected Runs",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 18},
+      "targets": [
+        {
+          "expr": "benchmark_rank_eligible{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"} == 0",
+          "refId": "A",
+          "instant": true
+        },
+        {
+          "expr": "benchmark_consumer_rejection_category{approach=~\"$approach\",tier=~\"$tier\",run_id=~\"$run_id\",matrix_id=~\"$matrix_id\"}",
+          "refId": "B",
+          "instant": true
+        }
+      ],
+      "options": {"showHeader": true}
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["kvrocks", "benchmark", "otel"],
+  "templating": {
+    "list": [
+      {"name": "matrix_id", "type": "query", "datasource": "Prometheus", "query": "label_values(benchmark_duration_ms, matrix_id)", "refresh": 2, "includeAll": true, "multi": false, "current": {"text": "All", "value": ".*"}},
+      {"name": "approach", "type": "query", "datasource": "Prometheus", "query": "label_values(benchmark_duration_ms, approach)", "refresh": 2, "includeAll": true, "multi": true, "current": {"text": "All", "value": [".*"]}},
+      {"name": "tier", "type": "query", "datasource": "Prometheus", "query": "label_values(benchmark_duration_ms, tier)", "refresh": 2, "includeAll": true, "multi": true, "current": {"text": "All", "value": [".*"]}},
+      {"name": "run_id", "type": "query", "datasource": "Prometheus", "query": "label_values(benchmark_duration_ms, run_id)", "refresh": 2, "includeAll": true, "multi": true, "current": {"text": "All", "value": [".*"]}}
+    ]
+  },
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "",
+  "title": "Kvrocks Benchmark Dashboard V1",
+  "uid": "kvrocks-bench-v1",
+  "version": 1,
+  "weekStart": ""
+}

@@ -11,6 +11,7 @@ Benchmark usage notes
    - OTLP HTTP ingest: localhost:4318
    - Prometheus query: http://localhost:9090
    - Grafana UI: http://localhost:3300
+   - Dashboard: Benchmarks / Kvrocks Benchmark Dashboard V1
 
 3) Start optional runner container for in-compose execution:
    docker compose --profile runner up -d kvrocks runner

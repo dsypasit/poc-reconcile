@@ -30,6 +30,7 @@ Endpoints:
 - OTLP HTTP ingest: `localhost:4318`
 - Prometheus query: `http://localhost:9090`
 - Grafana UI: `http://localhost:3300` (default login `admin` / `admin`)
+- Provisioned dashboard: `Kvrocks Benchmark Dashboard V1` (folder `Benchmarks`)
 
 ## Run the full benchmark matrix (recommended)
 
