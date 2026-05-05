@@ -1,0 +1,8 @@
+{
+  "approach": "approach-d",
+  "tier": "small",
+  "seed": 42,
+  "kvrocks_addr": "127.0.0.1:6666",
+  "prefix": "bench:d:matrix:matrix-20260505T064023Z:small:",
+  "run_id": "20260505T064025Z-04"
+}

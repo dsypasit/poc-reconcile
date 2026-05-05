@@ -1,0 +1,42 @@
+{
+  "run_id": "20260505T064023Z-01",
+  "approach": "approach-a",
+  "tier": "small",
+  "kvrocks_addr": "127.0.0.1:6666",
+  "seed": 42,
+  "started_at": "2026-05-05T06:40:23.658439Z",
+  "completed_at": "2026-05-05T06:40:24.27444Z",
+  "duration_ms": 616,
+  "ingest_ms": 374,
+  "cutover_ms": 0,
+  "cleanup_ms": 90,
+  "errors": {
+    "cleanup": 0,
+    "cutover": 0,
+    "ingest": 0
+  },
+  "counts": {
+    "records_deleted": 0,
+    "records_written": 1000
+  },
+  "metadata": {
+    "config_file": "config.json",
+    "dataset_hash": "115f68a434dbd1cc4295b19e80507bc4fa35016a35413a3945f14cb609495afc",
+    "ingest_throughput_rps": "2673.80",
+    "local_metrics_enabled": "true",
+    "manifest_file": "manifest.json",
+    "otel_enabled": "false",
+    "otel_export_status": "disabled",
+    "overall_throughput_rps": "1623.38",
+    "prefix": "bench:a:matrix:matrix-20260505T064023Z:small:",
+    "records_deleted": "0",
+    "records_written": "1000",
+    "strategy": "SCAN+UNLINK",
+    "validation_ms": "139",
+    "validation_passed": "true",
+    "validation_record_count_actual": "1000",
+    "validation_record_count_expected": "1000",
+    "validation_sample_mismatches": "0",
+    "validation_sample_size": "100"
+  }
+}

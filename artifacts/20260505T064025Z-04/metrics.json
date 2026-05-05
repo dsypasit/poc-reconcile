@@ -1,0 +1,49 @@
+{
+  "run_id": "20260505T064025Z-04",
+  "approach": "approach-d",
+  "tier": "small",
+  "kvrocks_addr": "127.0.0.1:6666",
+  "seed": 42,
+  "started_at": "2026-05-05T06:40:25.175634Z",
+  "completed_at": "2026-05-05T06:40:25.560108Z",
+  "duration_ms": 384,
+  "ingest_ms": 266,
+  "cutover_ms": 0,
+  "cleanup_ms": 0,
+  "errors": {
+    "cleanup": 0,
+    "cutover": 0,
+    "ingest": 0
+  },
+  "counts": {
+    "records_deleted": 0,
+    "records_written": 1000
+  },
+  "metadata": {
+    "active_version_after": "20260505T064025Z-04",
+    "active_version_before": "",
+    "cleanup_backoff_events": "0",
+    "cleanup_batch_size": "200",
+    "cleanup_batches": "0",
+    "cleanup_deleted": "0",
+    "cleanup_pause_ms": "20",
+    "config_file": "config.json",
+    "dataset_hash": "115f68a434dbd1cc4295b19e80507bc4fa35016a35413a3945f14cb609495afc",
+    "ingest_throughput_rps": "3759.40",
+    "local_metrics_enabled": "true",
+    "manifest_file": "manifest.json",
+    "otel_enabled": "false",
+    "otel_export_status": "disabled",
+    "overall_throughput_rps": "2604.17",
+    "prefix": "bench:d:matrix:matrix-20260505T064023Z:small:",
+    "records_deleted": "0",
+    "records_written": "1000",
+    "strategy": "VersionPrefix+ThrottledUNLINK",
+    "validation_ms": "114",
+    "validation_passed": "true",
+    "validation_record_count_actual": "1000",
+    "validation_record_count_expected": "1000",
+    "validation_sample_mismatches": "0",
+    "validation_sample_size": "100"
+  }
+}

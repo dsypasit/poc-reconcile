@@ -1,0 +1,15 @@
+{
+  "run_id": "20260505T064025Z-04",
+  "approach": "approach-d",
+  "tier": "small",
+  "seed": 42,
+  "record_count": 1000,
+  "dataset_hash": "115f68a434dbd1cc4295b19e80507bc4fa35016a35413a3945f14cb609495afc",
+  "domain_counts": {
+    "alpha": 334,
+    "beta": 333,
+    "gamma": 333
+  },
+  "config_file": "config.json",
+  "generated_at_utc": "2026-05-05T06:40:25.176287Z"
+}

@@ -1,0 +1,8 @@
+{
+  "approach": "approach-c",
+  "tier": "medium",
+  "seed": 42,
+  "kvrocks_addr": "127.0.0.1:6666",
+  "prefix": "bench:c:matrix:matrix-20260505T064023Z:medium:",
+  "run_id": "20260505T064031Z-07"
+}

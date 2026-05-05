@@ -1,0 +1,9 @@
+run_id,approach,tier,duration_ms,ingest_ms,cutover_ms,cleanup_ms,ingest_errors,cutover_errors,cleanup_errors,records_written,records_deleted,ingest_throughput_rps,overall_throughput_rps,validation_passed
+20260505T064023Z-01,approach-a,small,616,374,0,90,0,0,0,1000,0,2673.80,1623.38,true
+20260505T064024Z-02,approach-b,small,447,341,0,0,0,0,0,1000,0,2932.55,2237.14,true
+20260505T064024Z-03,approach-c,small,451,249,0,67,0,0,0,1000,0,4016.06,2217.29,true
+20260505T064025Z-04,approach-d,small,384,266,0,0,0,0,0,1000,0,3759.40,2604.17,true
+20260505T064025Z-05,approach-a,medium,2766,2553,0,79,0,0,0,10000,0,3916.96,3615.33,true
+20260505T064028Z-06,approach-b,medium,2819,2684,0,0,0,0,0,10000,0,3725.78,3547.36,true
+20260505T064031Z-07,approach-c,medium,2841,2638,0,69,0,0,0,10000,0,3790.75,3519.89,true
+20260505T064033Z-08,approach-d,medium,2750,2606,0,0,0,0,0,10000,0,3837.30,3636.36,true
