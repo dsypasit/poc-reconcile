@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -28,6 +27,8 @@ func WriteMatrixArtifacts(baseDir, matrixID string, runs []RunMetrics, failures 
 	for i := range runs {
 		RevalidateRunForConsumer(&runs[i])
 	}
+	rankedRuns, qualityFailures := BuildCanonicalRankableRuns(baseDir, runs)
+	failures = append(failures, qualityFailures...)
 
 	summary := MatrixSummary{
 		MatrixID:    matrixID,
@@ -46,7 +47,7 @@ func WriteMatrixArtifacts(baseDir, matrixID string, runs []RunMetrics, failures 
 	if err := writeMatrixCSV(filepath.Join(outDir, "matrix.csv"), runs); err != nil {
 		return "", err
 	}
-	if err := writeMatrixReport(filepath.Join(outDir, "report.md"), summary); err != nil {
+	if err := writeMatrixReport(filepath.Join(outDir, "report.md"), summary, rankedRuns); err != nil {
 		return "", err
 	}
 
@@ -96,7 +97,7 @@ func writeMatrixCSV(path string, runs []RunMetrics) error {
 	return nil
 }
 
-func writeMatrixReport(path string, summary MatrixSummary) error {
+func writeMatrixReport(path string, summary MatrixSummary, rankedRuns []RunMetrics) error {
 	var b strings.Builder
 	b.WriteString("# Benchmark Comparison Report\n\n")
 	b.WriteString(fmt.Sprintf("- Matrix ID: `%s`\n", summary.MatrixID))
@@ -112,19 +113,9 @@ func writeMatrixReport(path string, summary MatrixSummary) error {
 		b.WriteString("\n")
 	}
 
-	runs := append([]RunMetrics(nil), summary.Runs...)
-	sort.Slice(runs, func(i, j int) bool {
-		if runs[i].Tier != runs[j].Tier {
-			return runs[i].Tier < runs[j].Tier
-		}
-		return runs[i].DurationMS < runs[j].DurationMS
-	})
 	b.WriteString("## Ranking by Duration\n")
 	rank := 0
-	for _, m := range runs {
-		if m.Metadata["rank_eligible"] != "true" {
-			continue
-		}
+	for _, m := range rankedRuns {
 		rank++
 		b.WriteString(fmt.Sprintf("%d. `%s %s` duration=%dms overall_rps=%s validation=%s seed=%d\n",
 			rank,
