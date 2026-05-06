@@ -26,6 +26,7 @@ docker compose --profile otel-stack up -d kvrocks otel-collector prometheus graf
 ```
 
 Endpoints:
+
 - OTLP gRPC ingest: `localhost:4317`
 - OTLP HTTP ingest: `localhost:4318`
 - Prometheus query: `http://localhost:9090`
@@ -44,11 +45,67 @@ rtk go run ./cmd/bench \
   -timeout-seconds 300
 ```
 
+`cmd/bench` runs 8 scenarios in sequence:
+
+- `approach-a`, `approach-b`, `approach-c`, `approach-d` on `small`
+- `approach-a`, `approach-b`, `approach-c`, `approach-d` on `medium`
+
+### `cmd/bench` flags
+
+You can tune the run with these flags:
+
+- `-kvrocks-addr` (default `127.0.0.1:6666`): Kvrocks address.
+- `-artifacts-dir` (default `artifacts`): base directory for outputs.
+- `-seed` (default `42`): dataset seed for reproducibility.
+- `-timeout-seconds` (default `300`): per-scenario timeout.
+- `-otel-enabled` (default `true`): require OTEL export for valid/rankable
+  runs.
+- `-otel-endpoint` (default `otlp-local`): OTEL destination.
+  - `otlp-local` maps to `http://127.0.0.1:4318/v1/metrics`.
+  - You can also pass a full HTTP endpoint, for example
+    `http://otel-collector:4318/v1/metrics`.
+
+Example with explicit OTEL endpoint:
+
+```bash
+rtk go run ./cmd/bench \
+  -kvrocks-addr 127.0.0.1:6666 \
+  -artifacts-dir artifacts \
+  -timeout-seconds 300 \
+  -otel-enabled=true \
+  -otel-endpoint http://127.0.0.1:4318/v1/metrics
+```
+
 Matrix outputs are written to:
 
 - `artifacts/matrix-<timestamp>/matrix.json`
 - `artifacts/matrix-<timestamp>/matrix.csv`
 - `artifacts/matrix-<timestamp>/report.md`
+
+Per-scenario outputs are written to `artifacts/<run_id>/`, including:
+
+- `metrics.json`
+- `metrics.csv`
+- `config.json`
+- `manifest.json`
+- `otel-metrics.json`
+
+### Verify OTEL ingest after `cmd/bench`
+
+After the run, verify OTEL path in two places:
+
+1. Confirm export status in matrix output:
+
+```bash
+rtk rg -n "otel_export_status|otel_label_endpoint" artifacts/matrix-*/matrix.json
+```
+
+2. Confirm metrics exist in Prometheus:
+
+```bash
+curl -fsS "http://127.0.0.1:9090/api/v1/query" \
+  --get --data-urlencode 'query=bench.run.duration_ms'
+```
 
 ## Run a single approach
 
@@ -80,6 +137,7 @@ rtk go run ./cmd/approach-c \
 ```
 
 Validity and ranking behavior:
+
 - Producer hard gate requires `-otel-enabled=true` and successful export.
 - Consumer re-validation quarantines invalid runs with rejection categories.
 - Ranking uses canonical OTEL values (`duration_ms`, derived overall throughput)
